@@ -2,83 +2,79 @@ import requests
 from bs4 import BeautifulSoup
 import yt_dlp
 import os
-import hashlib
-from urllib.parse import urlparse, quote_plus
-import json
 import time
+import subprocess
+from urllib.parse import quote_plus
 
 ARCHIVE_DIR = 'musiqueplus_archive'
-os.makedirs(ARCHIVE_DIR, exist_ok=True)
-os.makedirs(f'{ARCHIVE_DIR}/wayback', exist_ok=True)
+TORRENTS_DIR = os.path.join(ARCHIVE_DIR, 'torrents')
+os.makedirs(TORRENTS_DIR, exist_ok=True)
 os.makedirs(f'{ARCHIVE_DIR}/youtube', exist_ok=True)
 
-def hash_file(path):
-    with open(path, 'rb') as f:
-        return hashlib.md5(f.read()).hexdigest()
+# Purge bullshit (optional: comment if you want to keep)
+for f in os.listdir(f'{ARCHIVE_DIR}/youtube'):
+    os.remove(os.path.join(f'{ARCHIVE_DIR}/youtube', f))
 
-def download_if_new(url, path):
-    if os.path.exists(path):
-        return False
-    try:
-        resp = requests.get(url, timeout=30)
-        resp.raise_for_status()
-        with open(path, 'wb') as f:
-            f.write(resp.content)
-        return True
-    except:
-        return False
-
-def scrape_wayback_snapshots(domain, limit=100):
-    wayback_url = f"https://web.archive.org/web/*/{domain}"
-    try:
-        resp = requests.get(wayback_url)
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        links = soup.select('.sparkline a')
-        snapshots = ['https://web.archive.org' + a['href'] for a in links][:limit]
-        return snapshots
-    except:
-        return []
-
-def download_snapshot(snapshot_url, domain):
-    parsed = urlparse(snapshot_url)
-    timestamp = parsed.path.split('/')[2]
-    path = f'{ARCHIVE_DIR}/wayback/{domain}_{timestamp}.html'
-    if download_if_new(snapshot_url, path):
-        print(f"Saved Wayback: {path}")
-
-def hoard_youtube(query, limit=50):
+def hoard_youtube(query, limit=10):
     ydl_opts = {
         'outtmpl': f'{ARCHIVE_DIR}/youtube/%(title)s.%(ext)s',
-        'format': 'best[height<=720]',
+        'format': 'best[height<=480]',  # 480p cap
         'quiet': False,
         'nooverwrites': True,
         'continuedl': True,
-        'postprocessor_args': ['-metadata', 'comment:Resurrected by musiqueplus-resurrection'],
-        'sleep_interval': 5,
+        'postprocessor_args': ['-metadata', 'comment:Resurrected by Yngr0ss - English vein'],
+        'sleep_interval': 2,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        search = f"ytsearch{limit}:{query}"
+        search = f"ytsearch{limit}:{query} full episode English"
         ydl.download([search])
 
-# Targets
-domains = ["musiqueplus.com", "musiquemax.com"]
-queries = [
-    "MusiquePlus VJ interview",
-    "MusiquePlus Top 10 2000s",
-    "Anne-Marie Losique MusiquePlus",
-    "MusiquePlus live performance",
-    "Québec rap MusiquePlus",
-    "Fax MusiquePlus",
-    "Boîte Vocale MusiquePlus"
+def scrape_1337x_magnets(query, limit=5):
+    search_url = f"https://1337x.to/search/{quote_plus(query)}/1/"
+    try:
+        resp = requests.get(search_url, timeout=10)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        rows = soup.select('table.table-list tr')[1:limit+1]
+        magnets = []
+        for row in rows:
+            name_link = row.select_one('.name a[href^="/torrent/"]')
+            if name_link:
+                torrent_url = 'https://1337x.to' + name_link['href']
+                name = name_link.text.strip()
+                detail_resp = requests.get(torrent_url, timeout=10)
+                detail_soup = BeautifulSoup(detail_resp.text, 'html.parser')
+                magnet_a = detail_soup.select_one('a[href^="magnet:"]')
+                if magnet_a:
+                    magnet = magnet_a['href']
+                    magnets.append((name, magnet))
+                    print(f"Magnet hoarded: {name}")
+        return magnets
+    except:
+        return []
+
+def download_magnet(magnet, path=TORRENTS_DIR):
+    if subprocess.call(['aria2c', '--dir=' + path, '--max-connection-per-server=16', '--split=16', magnet], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+        print("Torrent summoned.")
+    else:
+        print("Aria2c ritual failed — check install.")
+
+# The good vein: English 480p targets
+targets = [
+    "Room Raiders full episodes 480p English",
+    "Snoop Dogg Father Hood full episodes 480p English",
+    "Keeping Up with the Kardashians full episodes 480p English",
+    "Gene Simmons Family Jewels full episodes 480p English",
+    "Dogg After Dark Snoop full episodes 480p English",
 ]
 
-# Execute
-for domain in domains:
-    snapshots = scrape_wayback_snapshots(domain, 100)
-    for snap in snapshots:
-        download_snapshot(snap + '/http://' + domain, domain)
-        time.sleep(1)
+# Execute: torrents first, youtube fallback
+for target in targets:
+    print(f"Breaching: {target}")
+    magnets = scrape_1337x_magnets(target)
+    for name, magnet in magnets:
+        download_magnet(magnet)
+    # Fallback hoard
+    hoard_youtube(target, 5)
+    time.sleep(3)  # Veil breath
 
-for q in queries:
-    print(f"Hoards: {q}")
-    hoard_youtube(q, 50)
+print("Vein purified. Empire swells.")
