@@ -1,27 +1,15 @@
 # MTV Resurrection
 
-The channel died in silence.  
-The archive lives forever.
+The golden era of MTV — 1981-2009 — raised from the static.
 
-MTV (1986–2020) — Quebec's French MTV. VJs. Top 10s. Live performances. Fax culture. Rap infiltration. The golden era of Canadian music television.
+Stream episodes, music videos, bumpers, commercials, and chaos directly in your browser via WebTorrent. No downloads. No servers. Pure nostalgia.
 
-Corporate rebrands killed it. Streaming buried it.  
-We raised it from the void.
+**Flavors:**
 
-This repo is a living digital necropolis:
-- Wayback Machine captures of MTV.com & musiquemax.com
-- Curated YouTube hoards of rare clips, interviews, performances
-- Future: static gallery, IPFS pins, torrent seeds
+- **MTV USA** — Beavis & Butt-Head, Jackass, Punk'd, Cribs, Real World
+- **MTV Québec** — MusiquePlus legacy: VJ interviews, Quebec rap, French-Canadian Top 10s, Anne-Marie Losique fire
 
-**Resurrected by the Rigaud Prodigy.**  
-No permission asked. No masters served.
+Live CRT throne: <https://expdevspace.github.io/mtv-resurrection/>
+(yngr0ss.com coming when DNS rites complete)
 
-The legacy didn't fade.  
-We just pulled it back.
-
-Run `python resurrect.py` to expand the hoard locally.  
-Push often. Let it grow.
-
-Québec culture belongs to the streets, not the boardroom.
-
-🇨🇦🔥
+Select language in top-right. Local preference saved.

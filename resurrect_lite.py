@@ -53,7 +53,7 @@ def hoard_youtube(query, limit=5):
         'quiet': False,
         'nooverwrites': True,
         'continuedl': True,
-        'postprocessor_args': ['-metadata', 'comment:Resurrected by musiqueplus-resurrection'],
+        'postprocessor_args': ['-metadata', 'comment:Resurrected by mtv-resurrection'],
         'sleep_interval': 5,
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -61,9 +61,9 @@ def hoard_youtube(query, limit=5):
         ydl.download([search])
 
 # Targets - reduced for testing
-domains = ["musiqueplus.com"]
+domains = ["mtv.com"]
 queries = [
-    "MusiquePlus VJ interview",
+    "MTV VJ interview",
 ]
 
 # Execute
@@ -75,4 +75,4 @@ for domain in domains:
 
 for q in queries:
     print(f"Hoards: {q}")
-    hoard_youtube(q, 5)
+    hoard_youtube(q, 5)be(q, 5)

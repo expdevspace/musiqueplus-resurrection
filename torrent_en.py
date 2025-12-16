@@ -1,12 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 import os
-import subprocess
+import json
 import time
+import re
 from urllib.parse import quote_plus
 
-TORRENTS_DIR = 'mtv_archive_en/torrents'
-os.makedirs(TORRENTS_DIR, exist_ok=True)
+MAGNETS_DIR = 'magnets'
+os.makedirs(MAGNETS_DIR, exist_ok=True)
 
 def scrape_1337x_magnets(query, limit=10):
     search_url = f"https://1337x.to/search/{quote_plus(query)}/1/"
@@ -53,8 +54,17 @@ def scrape_1337x_magnets(query, limit=10):
                     if magnet_a:
                         magnet = magnet_a.get('href', '')
                         if magnet:
-                            magnets.append((name, str(magnet)))
-                            print(f"EN Magnet: {name}")
+                            # Extract year from title using regex
+                            year_match = re.search(r'\b(19|20)\d{2}\b', name)
+                            year = year_match.group() if year_match else '1985'
+                            
+                            magnets.append({
+                                "name": name,
+                                "magnet": str(magnet),
+                                "year": year,
+                                "duration": "1800"  # Default 30 minutes, will be updated later
+                            })
+                            print(f"EN Magnet: {name} ({year})")
         return magnets[:5]  # cap per query
     except requests.exceptions.RequestException as e:
         print(f"Network error while scraping: {e}")
@@ -63,21 +73,12 @@ def scrape_1337x_magnets(query, limit=10):
         print(f"Scrape fail: {e}")
         return []
 
-def download_magnet(magnet, path=TORRENTS_DIR):
-    try:
-        print(f"Attempting to download magnet: {magnet[:50]}...")
-        result = subprocess.run(['aria2c', '--dir=' + path, '--max-connection-per-server=16', '--split=16', '--seed-time=0', magnet], 
-                              capture_output=True, text=True, timeout=30)
-        if result.returncode == 0:
-            print("EN Torrent summoned.")
-        else:
-            print(f"Aria2c summon failed with error: {result.stderr}")
-    except subprocess.TimeoutExpired:
-        print("Aria2c timed out.")
-    except FileNotFoundError:
-        print("Aria2c not found. Please install aria2c.")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
+def save_magnets_json(magnets, filename):
+    """Save magnets array to JSON file"""
+    filepath = os.path.join(MAGNETS_DIR, filename)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(magnets, f, indent=2, ensure_ascii=False)
+    print(f"Saved {len(magnets)} magnets to {filepath}")
 
 # English MTV targets: era veins
 targets_en = [
@@ -91,11 +92,13 @@ targets_en = [
 ]
 
 print("Starting English torrent search...")
+all_magnets = []
 for target in targets_en:
     print(f"EN Breach: {target}")
     magnets = scrape_1337x_magnets(target)
-    for name, magnet in magnets:
-        download_magnet(magnet)
+    all_magnets.extend(magnets)
     time.sleep(2)
 
+# Save all magnets to JSON
+save_magnets_json(all_magnets, 'en.json')
 print("English MTV vein: gods summoned.")

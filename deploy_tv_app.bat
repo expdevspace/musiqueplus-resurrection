@@ -31,6 +31,6 @@ git push origin main
 
 echo.
 echo [+] Deployment complete!
-echo    Visit: https://expdevspace.github.io/musiqueplus-resurrection/
+echo    Visit: https://expdevspace.github.io/mtv-resurrection/
 echo.
 pause

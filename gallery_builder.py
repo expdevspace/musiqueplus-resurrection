@@ -3,7 +3,7 @@ import glob
 import json
 from jinja2 import Environment, FileSystemLoader  # pip install jinja2 if not hexed in
 
-ARCHIVE_DIR = 'musiqueplus_archive'
+ARCHIVE_DIR = 'mtv_archive'
 TV_ARCHIVE_EN = 'mtv_archive_en'
 TV_ARCHIVE_FR = 'mtv_archive_fr'
 OUTPUT_DIR = 'docs'  # for GitHub Pages

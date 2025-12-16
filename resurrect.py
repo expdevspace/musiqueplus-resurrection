@@ -6,7 +6,7 @@ import time
 import subprocess
 from urllib.parse import quote_plus
 
-ARCHIVE_DIR = 'musiqueplus_archive'
+ARCHIVE_DIR = 'mtv_archive'
 TORRENTS_DIR = os.path.join(ARCHIVE_DIR, 'torrents')
 os.makedirs(TORRENTS_DIR, exist_ok=True)
 os.makedirs(f'{ARCHIVE_DIR}/youtube', exist_ok=True)

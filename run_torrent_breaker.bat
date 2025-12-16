@@ -25,6 +25,6 @@ copy retro_tv_enhanced.html docs\index.html >nul
 echo.
 echo [+] Process completed!
 echo.
-echo Visit https://expdevspace.github.io/musiqueplus-resurrection/ to view the enhanced CRT
+echo Visit https://expdevspace.github.io/mtv-resurrection/ to view the enhanced CRT
 echo.
 pause

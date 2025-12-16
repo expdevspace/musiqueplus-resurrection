@@ -22,5 +22,5 @@ python gallery_builder.py
 
 echo.
 echo All processes completed!
-echo Visit https://expdevspace.github.io/musiqueplus-resurrection/ to view the gallery
+echo Visit https://expdevspace.github.io/mtv-resurrection/ to view the gallery
 pause
